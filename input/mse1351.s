@@ -7,6 +7,7 @@
 .include "geossym.inc"
 .include "geosmac.inc"
 .include "c64.inc"
+.include "config.inc"
 
 .segment "inputdrv"
 
@@ -59,6 +60,13 @@ UM_1:
 UM_2:
 	LoadB cia1base+2, $ff
 	LoadB cia1base+0, $40
+.ifdef ultimateTurbo
+	; the SID needs ~1 ms of real time to sample the pots of the newly
+	; selected port: run the delay loop at 1 MHz, also in turbo mode
+	lda clkreg
+	pha
+	LoadB clkreg, 0
+.endif
 	ldx #$66
 UM_3:
 	nop
@@ -66,6 +74,10 @@ UM_3:
 	nop
 	dex
 	bne UM_3
+.ifdef ultimateTurbo
+	pla
+	sta clkreg
+.endif
 	stx r1L
 
 	lda sidbase+$19

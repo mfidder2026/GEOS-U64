@@ -98,7 +98,18 @@ _IRQHandler:
 	jsr _DoKeyboardScan
 	jsr SetMouse
 .else
+.ifdef ultimateTurbo
+	; the scan reads $DC01 right after writing $DC00: give the keyboard
+	; lines 1 MHz settling time, also in turbo mode
+	lda clkreg
+	pha
+	LoadB clkreg, 0
+.endif
 	jsr _DoKeyboardScan
+.ifdef ultimateTurbo
+	pla
+	sta clkreg
+.endif
 .endif
 	lda alarmWarnFlag
 	beq @5

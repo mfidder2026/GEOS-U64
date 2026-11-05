@@ -41,6 +41,9 @@ ToBASIC2:
 	ldx #$ff
 	txs
 	LoadB grcntrl2, 0
+.ifdef ultimateTurbo
+	sta clkreg              ; 1 MHz for the C64 KERNAL serial routines
+.endif
 	jsr KERNALCIAInit
 	ldx curDevice
 	lda #0

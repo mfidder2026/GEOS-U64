@@ -104,6 +104,7 @@ EDT5:	sta r0L
 	LoadW r6, DeskTopName
 	jsr GetFile
 	bnex EDT4
+.ifndef skipDeskTopVersionCheck
 	lda fileHeader+O_GHFNAME+13
 .ifdef bsw128
 	cmp #'2'
@@ -119,6 +120,7 @@ EDT5:	sta r0L
 	cmp #'5'
 .endif
 	bcc EDT4
+.endif
 EDT6:	lda TempCurDrive
 	jsr SetDevice
 	LoadB r0L, NULL

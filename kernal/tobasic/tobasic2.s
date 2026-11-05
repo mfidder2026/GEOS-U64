@@ -37,6 +37,9 @@ _ToBASIC:
 	jsr PurgeTurbo
 	LoadB CPU_DATA, KRNL_BAS_IO_IN
 	LoadB $DE00, 0
+.ifdef ultimateTurbo
+	sta clkreg              ; 1 MHz for the C64 KERNAL serial routines
+.endif
 	jmp $fce2
 .else
 .ifdef bsw128

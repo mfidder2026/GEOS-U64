@@ -124,17 +124,62 @@ config_inc = 1
 	;useRamCart128 = 1
 
 	; GEOS2000
-	; makes drawing dialog boxes much faster, might cause visual mess
+	; makes drawing dialog boxes much faster (shadow drawn as two strips)
 	; takes more bytes
 	;speedupDlgBox = 1
 
 	; GEOS2000
-	; bug - when 0 no blinking in menu
+	; shorter menu flash code, same behaviour
 	;newMenu_5 = 1
 
 	; RTC driver to set date&time upon boot
 	;rtc_Ultimate2Plus = 1
 
+.endif
+
+;------------------------
+; GEOS for the Commodore 64 Ultimate / Ultimate 64
+;------------------------
+; Needs on the Ultimate: Command Interface enabled, REU enabled,
+; Turbo Control = "TurboEnable Bit" (see ULTIMATE.md)
+.ifdef u64
+	; reusable Wheels optimizations and fixes (frees kernal space)
+	wheels_size = 1
+	wheels_size_and_speed = 1
+	wheels_remove_BootGEOS = 1
+	wheels_fixes = 1
+
+	remove_dead_bytes = 1
+
+	; deskTop resets to BASIC instead of starting a BASIC program
+	; (frees ~380 bytes for the network API; start PRGs from the
+	; Ultimate menu instead)
+	removeToBASIC = 1
+
+	; set date&time from the Ultimate's RTC on boot
+	rtc_Ultimate2Plus = 1
+
+	; detect the REU at boot and set ramExpSize for Configure
+	detectREU = 1
+
+	; start any "DESK TOP" found on the disk, without the V1.5+ check
+	skipDeskTopVersionCheck = 1
+
+	; GEOS2000: faster dialog box shadow, shorter menu flash code
+	speedupDlgBox = 1
+	newMenu_5 = 1
+
+	; network API (UCI sockets) and turbo control, jump table at $FE50
+	ultimateNet = 1
+
+	; switch the turbo on at boot via $D030 bit 0. Disk drivers turn it
+	; off around every disk access (they save/clear/restore $D030).
+	ultimateTurbo = 1
+
+	; uncomment to force a CPU speed at boot instead of the one set in
+	; the Ultimate menu: $D031 value, bits 0-3 speed index (15 = 48 MHz
+	; on U64, 64 MHz on U64E2/C64U), bit 7 = 1 badlines off
+	;ultimateBootSpeed = $8F
 .endif
 
 ; Feel (almost) free to change values below:

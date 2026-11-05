@@ -227,6 +227,12 @@ KERNAL_SOURCES += \
 	kernal/wheels/reux.s
 endif
 
+# code that is in the Ultimate variant only
+ifeq ($(VARIANT), u64)
+KERNAL_SOURCES += \
+	kernal/ultimate/uci.s
+endif
+
 ifeq ($(VARIANT), bsw128)
 RELOCATOR_SOURCES = \
 	kernal/start/relocator128.s
@@ -243,7 +249,8 @@ DRIVER_SOURCES= \
 	input/lightpen.bin \
 	input/mse1351.bin \
 	input/koalapad.bin \
-	input/pcanalog.bin
+	input/pcanalog.bin \
+	input/u64input.bin
 
 DEPS= \
 	config.inc \
@@ -281,7 +288,8 @@ ALL_BINS= \
 	$(BUILD_DIR)/input/lightpen.bin \
 	$(BUILD_DIR)/input/mse1351.bin \
 	$(BUILD_DIR)/input/koalapad.bin \
-	$(BUILD_DIR)/input/pcanalog.bin
+	$(BUILD_DIR)/input/pcanalog.bin \
+	$(BUILD_DIR)/input/u64input.bin
 
 ifeq ($(VARIANT), bsw128)
 	ALL_BINS += \
@@ -419,6 +427,9 @@ $(BUILD_DIR)/input/koalapad.bin: $(BUILD_DIR)/input/koalapad.o $(INPUTCFG) $(DEP
 
 $(BUILD_DIR)/input/pcanalog.bin: $(BUILD_DIR)/input/pcanalog.o $(INPUTCFG) $(DEPS)
 	$(LD) -C $(INPUTCFG) $(BUILD_DIR)/input/pcanalog.o -o $@
+
+$(BUILD_DIR)/input/u64input.bin: $(BUILD_DIR)/input/u64input.o $(INPUTCFG) $(DEPS)
+	$(LD) -C $(INPUTCFG) $(BUILD_DIR)/input/u64input.o -o $@
 
 $(BUILD_DIR)/%.o: %.s
 	@mkdir -p `dirname $@`

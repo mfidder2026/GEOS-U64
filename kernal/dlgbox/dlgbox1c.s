@@ -69,18 +69,20 @@ DrawDlgBox:
 	lda (DBoxDesc),y
 	and #%00011111
 .ifdef speedupDlgBox
-	bne DrwDlgSpd0
+	; GEOS2000: draw the shadow as two strips instead of a full rectangle
+	; that is then mostly painted over by the box
+	bne @spd0
 	jmp @1
-DrwDlgSpd0:
+@spd0:
 	;1st: right,right+8,top+8,bottom
 	;2nd: left+8,right+8,bottom,bottom+8
 	jsr SetPattern
 	PushW DBoxDesc
 	ldy #0
 	lda (DBoxDesc),y
-	bpl DrwDlgSpd1
+	bpl @spd1
 	LoadW DBoxDesc, DBDefinedPos-1
-DrwDlgSpd1:
+@spd1:
 	ldy #1
 	lda (DBoxDesc),y
 	addv 8
@@ -160,14 +162,12 @@ Dialog_1:
 	jmp RcvrMnu0
 
 CalcDialogCoords:
-.ifdef speedupDlgBox
-	LoadB r1H, 0
-.else
+	; C=1: shadow (+8). GEOS2000's speedupDlgBox always used 0 here, so
+	; Dialog_1 no longer recovered the shadow and it stayed on screen.
 	lda #0
 	bcc @1
 	lda #8
 @1:	sta r1H
-.endif
 	PushW DBoxDesc
 	ldy #0
 	lda (DBoxDesc),y

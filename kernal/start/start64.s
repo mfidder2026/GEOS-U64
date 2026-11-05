@@ -130,6 +130,26 @@ ASSERT_NOT_BELOW_IO
 .ifdef useRTC
 	jsr RTCSetupDateAndTime
 .endif
+.ifdef detectREU
+	; GEOBOOT used to fill in the REU size; it is not on our disk.
+	; Configure 2.0 needs ramExpSize = number of 64 KB banks (max. 8).
+	jsr DetectREU
+.endif
+.ifdef ultimateTurbo
+	; Ultimate turbo: $D031 reads $FF unless Turbo Control is set to
+	; "TurboEnable Bit"/"U64 Turbo Registers" (and on a C64 or C128).
+	; Disk drivers clear $D030 during I/O and restore it afterwards.
+	LoadB CPU_DATA, IO_IN
+	lda $d031
+	cmp #$ff
+	beq @noTurbo
+.ifdef ultimateBootSpeed
+	LoadB $d031, ultimateBootSpeed
+.endif
+	LoadB clkreg, 1
+@noTurbo:
+	LoadB CPU_DATA, RAM_64K
+.endif
 
 	;
 	jsr FirstInit
@@ -430,3 +450,74 @@ info1581:	; gets 1581 drive info at $a6e8 in drive ROM
 
 .endif
 
+.ifdef detectREU
+; Sets ramExpSize to the number of 64 KB REU banks (0 = no REU), at most
+; REU_MAX_BANKS. Writes a marker byte to offset 0 of every bank tested,
+; and stops when a bank does not keep it or when bank 0 changes
+; (address wrap-around of a smaller REU).
+REU_MAX_BANKS = 8
+
+DetectREU:
+	php
+	sei
+	LoadB CPU_DATA, IO_IN
+	ldy #0
+	sty ramExpSize
+	; REU present? Two DMA round trips through bank 0 must work; an
+	; open I/O area can echo register writes, so test the DMA itself
+	lda #$a5
+@test:	sta reuMark+1
+	lda #0
+	jsr @stashv
+	lda #0
+	sta reuMark
+	jsr @fetch
+	cmp reuMark+1
+	bne @end
+	eor #$ff                ; $a5 -> $5a, $5a -> $a5: stop
+	cmp #$5a
+	beq @test
+	jsr @stash              ; bank 0 := 0
+@next:	iny
+	cpy #REU_MAX_BANKS
+	beq @size
+	jsr @stash              ; bank Y := Y
+	lda #0
+	jsr @fetch              ; bank 0 still 0?
+	bne @size
+	tya
+	jsr @fetch              ; bank Y kept its marker?
+	cmp reuMark+1
+	beq @next
+@size:	sty ramExpSize
+@end:	LoadB CPU_DATA, RAM_64K
+	plp
+	rts
+
+; store Y into offset 0 of bank Y
+@stash:	sty reuMark+1
+	tya
+; A = bank: store reuMark+1 into its byte 0
+@stashv:
+	ldx #$90                ; stash, execute now
+	bne @op
+; A = bank: fetch its byte 0 into reuMark (returned in A, Z set)
+@fetch:	ldx #$91                ; fetch, execute now
+@op:	sta EXP_BASE+6          ; bank
+	LoadW EXP_BASE+2, reuMark+1
+	lda #0
+	sta EXP_BASE+4
+	sta EXP_BASE+5
+	sta EXP_BASE+8
+	sta EXP_BASE+10         ; both addresses count up
+	LoadB EXP_BASE+7, 1     ; length 1
+	cpx #$91
+	bne @go
+	LoadW EXP_BASE+2, reuMark
+@go:	stx EXP_BASE+1
+	lda reuMark
+	rts
+
+reuMark:
+	.byte 0, 0              ; fetched byte, byte to stash
+.endif

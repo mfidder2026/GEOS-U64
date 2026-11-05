@@ -1,5 +1,7 @@
 # GEOS Source Code
 
+> **GEOS-U64:** this fork adds a `u64` variant for the Commodore 64 Ultimate (network API, turbo, REU detection, mouse + joystick driver, settings apps). See [ULTIMATE.md](ULTIMATE.md). The original GEOS disk needed to build a bootable image is not included.
+
 by Berkeley Softworks, reverse engineered by *Maciej Witkowiak*, *Michael Steil*.
 
 ## Description

@@ -1,0 +1,8 @@
+; resource file for network.c
+
+HEADER APPLICATION "Network" "Network" "V1.0" {
+dostype USR
+author "GEOS-U64"
+info "Network setup of your C64 Ultimate: DHCP, static IP, host name, services, internet time."
+icon "build/icons/network.raw"
+}

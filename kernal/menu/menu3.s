@@ -204,21 +204,7 @@ LEFE4:  ldx menuNumber
 	jsr _Sleep
 	jsr Menu_7
 .else
-Menu_5Help:
-	MoveB selectionFlash, r0L
-	LoadB r0H, NULL
-	jsr _Sleep
-	jmp Menu_7
-
-Menu_5:
-	jsr _MouseOff
-	jsr Menu_7
-	jsr MenuDoInvert
-	lda r9L
-	ldx menuNumber
-	sta menuOptionTab,x
-	jsr Menu_8
-	bbsf 7, r1L, Menu_52
+	; GEOS2000: the flash delay as a subroutine (same behaviour, shorter)
 	bvs Menu_51
 	jsr Menu_5Help
 	jsr MenuDoInvert
@@ -250,6 +236,14 @@ Menu_6:
 	jsr Menu_8
 	pla
 	jmp (r0)
+
+.ifdef newMenu_5
+Menu_5Help:
+	MoveB selectionFlash, r0L
+	LoadB r0H, NULL
+	jsr _Sleep
+	jmp Menu_7
+.endif
 .endif
 
 .ifdef wheels ; xxx moved

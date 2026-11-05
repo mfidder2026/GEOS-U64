@@ -1,0 +1,8 @@
+; resource file for u64setup.c
+
+HEADER APPLICATION "U64 Setup" "U64 Setup" "V1.0" {
+dostype USR
+author "GEOS-U64"
+info "Change the settings of your C64 Ultimate: turbo, REU, mouse, drives. Needs the GEOS-U64 kernal."
+icon "build/icons/u64setup.raw"
+}

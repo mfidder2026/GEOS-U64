@@ -1,0 +1,8 @@
+; resource file for nettest.c
+
+HEADER APPLICATION "nettest" "NetTest" "V1.0" {
+dostype USR
+author "GEOS-U64"
+info "Tests the Ultimate network API of the GEOS-U64 kernal: command interface, turbo, IP address and a HTTP request."
+icon "build/icons/nettest.raw"
+}
